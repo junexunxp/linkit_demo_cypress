@@ -803,7 +803,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>smart_washing_machine.srec</state>
+                    <state>linkkit_demo.srec</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -858,7 +858,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>smart_washing_machine.out</state>
+                    <state>linkkit_demo.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>
@@ -1156,7 +1156,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>smart_washing_machine_import_lib.o</state>
+                    <state>linkkit_demo_import_lib.o</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>
@@ -2000,7 +2000,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>smart_washing_machine.out</state>
+                    <state>linkkit_demo.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>
