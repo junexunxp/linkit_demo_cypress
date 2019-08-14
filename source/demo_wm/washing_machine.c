@@ -1164,7 +1164,7 @@ void wm_property_post(wm_propertity_e epro){
 
 		return;
 	}
-	memset(property_payload,0,sizeof(*property_payload));
+	memset(property_payload,0,128);
 	int offset = 0;
 
 	if(epro == ALL_PRO){

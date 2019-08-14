@@ -51,8 +51,8 @@ extern "C"
 
 #ifdef DEBUG
     #ifdef WPRINT_ENABLE_ERROR
-        #define WPRINT_ERROR(args)                      do { WPRINT_MACRO(args); WICED_ASSERTION_FAIL_ACTION(); } while(0)
-        #define wiced_assert( error_string, assertion ) do { if (!(assertion)) { WICED_ASSERTION_FAIL_ACTION(); } } while(0)
+        #define WPRINT_ERROR(args)                      do { WPRINT_MACRO(args) } while(0)
+        #define wiced_assert( error_string, assertion ) do { if (!(assertion)) { WPRINT_MACRO( ( error_string ) ); } } while(0)
         #define wiced_minor_assert( error_string, assertion )   do { if ( !(assertion) ) WPRINT_MACRO( ( error_string ) ); } while(0)
     #else
         #define WPRINT_ERROR(args)

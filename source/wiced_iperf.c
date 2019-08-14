@@ -45,6 +45,7 @@ extern wiced_result_t wiced_wlan_connectivity_init(void);
 extern void add_wlan_interface(void);
 
 extern int linkkit_example_solo(int argc, char **argv);
+void demo_button_init(void );
 
 /*******************************************************************************
  * Variables
@@ -136,7 +137,7 @@ static void demo_task(void *arg)
 
     
     BOARD_InitNetwork();
-    
+    demo_button_init();
 #if (DEMO_OPTION == DEMO_DIM_LIGHT)
 	PRINTF("Run Dimmable Light Demo...\r\n");
     lighting_run(NULL,NULL);
@@ -148,6 +149,57 @@ static void demo_task(void *arg)
     wm_run(NULL, NULL);
 #endif
 }
+
+
+static uint32_t button_state_flag = 0;
+static TaskHandle_t button_task = NULL;
+
+static void button_handle_task(void *arg){
+  while(1){
+	button_task = xTaskGetCurrentTaskHandle();
+	ulTaskNotifyTake(pdFALSE,portMAX_DELAY);
+	if(button_state_flag &0x01){
+		PRINTF("Button short pressed\r\n");
+	}else if(button_state_flag &0x02){
+
+		PRINTF("Button keep pressed\r\n");
+		//
+		kv_item_delete("wifi_ssid");
+		kv_item_delete("wifi_key");
+		NVIC_SystemReset();
+	}
+	button_state_flag = 0;
+  }
+
+
+}
+
+
+static uint32_t time_anchor_bsc = 0;
+
+void demo_button_state_changed(int pressed){
+	if(pressed){
+		time_anchor_bsc = xTaskGetTickCount() * ( 1000 / configTICK_RATE_HZ );
+		return;
+	}
+
+	uint32_t time_now = xTaskGetTickCount() * ( 1000 / configTICK_RATE_HZ );
+	if(time_now - time_anchor_bsc > 2000){
+		
+		button_state_flag |= 0x02;
+	}else{
+
+		button_state_flag |= 0x01;
+
+	}
+	BaseType_t xHigherPriorityTaskWoken;
+    xHigherPriorityTaskWoken = pdFALSE;
+	vTaskNotifyGiveFromISR(button_task,&xHigherPriorityTaskWoken);//
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+
+#if (DEMO_OPTION == DEMO_WASHING_MACHINE)
 
 /*******************************************************************************
 * FUNCTION:
@@ -179,6 +231,35 @@ static void GuiThread( void* arg )
   EwDone();
 }
 
+#endif
+
+
+
+void demo_button_init(void )
+{
+#if (DEMO_OPTION != DEMO_WASHING_MACHINE)
+	EwBspConfigButton(demo_button_state_changed);
+#endif
+	NVIC_SetPriority(BOARD_USER_BUTTON_IRQ, (1<<__NVIC_PRIO_BITS) - 1);
+}
+
+static uint8_t app_wifi_ib_stored_valid(void ){
+	char wifi_ssid[40]={0};
+	char wifi_key[40] = {0};
+	int ssid_len = 40;
+	int key_len = 40;
+	if(HAL_Kv_Get("wifi_ssid", wifi_ssid, &ssid_len) != 0){
+
+		return 0;
+	}
+	if(ssid_len == 1 && wifi_ssid[0] == 0xff){
+		return 0;
+
+	}
+	return 1;
+
+}
+
 void app_wait_wifi_connect(void ){
 
 	char wifi_ssid[40]={0};
@@ -186,6 +267,7 @@ void app_wait_wifi_connect(void ){
 	int ssid_len = 40;
 	int key_len = 40;
 	wwd_result_t err = WWD_SUCCESS;
+
 	int cnt = 0x0e;
 	while((wwd_wifi_get_ap_is_up() != WICED_TRUE)){
 		
@@ -215,12 +297,35 @@ void app_wait_wifi_connect(void ){
 		    }
 		  }
 		}
-        
+
         HAL_SleepMs(1000);
         if((cnt++ & 0x0f) == 0x0f){
           PRINTF("Join AP failed by using KV info\r\n");
         }
+#if 1//USE_SMART_CONFIG
+	static uint8_t first_run = 0;
+	if(!first_run && !app_wifi_ib_stored_valid()){
+		first_run = 1;
+        #if 0
+		PRINTF("start smart config\r\n");
+		extern int awss_config_press();
+    	awss_config_press();
+		awss_start();
+        #else
+                awss_dev_ap_start();
+        #endif
+		
+	}else{
+		first_run = 1;
+	}
+        
+#else
+	PRINTF("Scan test start..\r\n");
+	test_scan();
+	HAL_SleepMs(5000);
+#endif
     } 
+
 }
 
 
@@ -256,51 +361,6 @@ void app_process_wifi_config(char *ssid, char *key){
 
 }
 
-void app_process_recive_cmd(char *buff, uint8_t len){
-  uint8_t ptr = 2;
-  uint8_t i = 0;
-  if(buff[0] == 'c'){//connect wifi
-		char wifi_ssid[40]={0};
-		char wifi_key[40] = {0};
-		if(buff[1] == ' '){
-			while(buff[ptr] != ' '){
-				wifi_ssid[i++] = buff[ptr++];
-			}
-			ptr++;
-			i=0;
-			while(buff[ptr] != '\r' && (ptr<len)){
-				wifi_key[i++] = buff[ptr++];
-			}
-			if(app_wifi_ib_same(wifi_ssid,wifi_key) == 0){
-				HAL_Kv_Set("wifi_ssid", wifi_ssid, strlen(wifi_ssid), 0);
-				HAL_Kv_Set("wifi_key", wifi_key, strlen(wifi_key), 0);
-			}
-                        wiced_ssid_t ap_ssid = {0};
-
-                        ap_ssid.length = strlen(wifi_ssid);
-                        memcpy(ap_ssid.value,wifi_ssid,ap_ssid.length);
-                        //wwd_wifi_join(&ap_ssid, AP_SEC, (uint8_t *)wifi_key, strlen(wifi_key), NULL, WWD_STA_INTERFACE);
-                        HAL_Printf("join wifi:%s....\r\n",wifi_ssid);
-		}
-
-  }else if(buff[0] == 'f'){//factory new module
-  	uint8_t value_invalid = 0xff;
-	HAL_Kv_Set("wifi_ssid", &value_invalid, 1, 0);
-	HAL_Kv_Set("wifi_key", &value_invalid, 1, 0);
-	wwd_wifi_leave(WWD_STA_INTERFACE);
-        HAL_Printf("Factory wifi module....\r\n");
-  }else if(buff[0] == 'w'){
-  	wm_cli_process(buff+1, len - 1);
-  	
-
-  }else{
-
-  	HAL_Printf("Unknown command\r\n");
-
-  }
-  
-}
-
 /*!
  * @brief Main function.
  */
@@ -328,7 +388,7 @@ int main(void)
     /* create thread that drives the Embedded Wizard GUI application... */
     EwPrint( "Create UI thread...                          " );
     xTaskCreate( GuiThread, "EmWi_Task", 1280, NULL, 2, NULL );
-    EwPrint( "[OK]\n" );
+    EwPrint( "[OK]\n" );	
 #endif
 
     if (xTaskCreate(demo_task, "demo_task", 1000, NULL, 3, NULL) != pdPASS)
@@ -336,7 +396,11 @@ int main(void)
         PRINTF("Task creation failed!.\r\n");
         while (1);
     }
-	
+	if (xTaskCreate(button_handle_task, "button_handle_task", 256, NULL, 0, NULL) != pdPASS)
+    {
+        PRINTF("Task creation failed!.\r\n");
+        while (1);
+    }
     vTaskStartScheduler();
 
     return 0;

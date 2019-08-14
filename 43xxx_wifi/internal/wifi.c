@@ -149,8 +149,8 @@ static int                          current_bssid_list_length = 0;
 
 //static wiced_wifi_softap_event_handler_t ap_event_handler;
 
-//static wiced_country_code_t         WICED_DEEP_SLEEP_SAVED_VAR( country_code ) = WICED_DEFAULT_COUNTRY_CODE;
-static wiced_country_code_t         WICED_DEEP_SLEEP_SAVED_VAR( country_code ) = WICED_COUNTRY_UNITED_STATES;
+static wiced_country_code_t         WICED_DEEP_SLEEP_SAVED_VAR( country_code ) = WICED_COUNTRY_CHINA;
+//static wiced_country_code_t         WICED_DEEP_SLEEP_SAVED_VAR( country_code ) = WICED_COUNTRY_UNITED_STATES;
 //static wiced_wifi_rrm_event_handler_t rrm_event_handler;
 
 //static wiced_wifi_nan_event_handler_t nan_event_handler;

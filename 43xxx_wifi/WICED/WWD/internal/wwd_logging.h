@@ -48,7 +48,7 @@ extern "C"
 
 #include <stdio.h>
 extern int wwd_logging_enabled;
-#define WWD_LOG( x ) if (wwd_logging_enabled) {printf x; }
+#define WWD_LOG( x ) if (wwd_logging_enabled) {PRINTF x; }
 
 #elif defined( WWD_LOGGING_BUFFER_ENABLE )
 extern int wwd_logging_enabled;

@@ -441,6 +441,14 @@
                     <state>$PROJ_DIR$/linkkit/dev_sign</state>
                     <state>$PROJ_DIR$/linkkit/infra</state>
                     <state>$PROJ_DIR$/linkkit/mqtt</state>
+                    <state>$PROJ_DIR$/linkkit/wifi_provision</state>
+                    <state>$PROJ_DIR$/linkkit/wifi_provision/frameworks</state>
+                    <state>$PROJ_DIR$/linkkit/wifi_provision/frameworks/aplist</state>
+                    <state>$PROJ_DIR$/linkkit/wifi_provision/frameworks/ieee80211</state>
+                    <state>$PROJ_DIR$/linkkit/wifi_provision/frameworks/statics</state>
+                    <state>$PROJ_DIR$/linkkit/wifi_provision/frameworks/utils</state>
+                    <state>$PROJ_DIR$/linkkit/wifi_provision/p2p</state>
+                    <state>$PROJ_DIR$/linkkit/wifi_provision/dev_ap</state>
                     <state>$PROJ_DIR$/linkkit/wrappers</state>
                     <state>$PROJ_DIR$/linkkit/wrappers/external_libs</state>
                     <state>$PROJ_DIR$\mbedtls\include\mbedtls</state>
@@ -2338,6 +2346,12 @@
         <group>
             <name>app</name>
             <file>
+                <name>$PROJ_DIR$\43xxx_wifi\app\dhcp_server.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\43xxx_wifi\app\dhcp_server.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\43xxx_wifi\app\test_scan.c</name>
             </file>
             <file>
@@ -3890,6 +3904,117 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\linkkit\mqtt\MQTTUnsubscribeClient.c</name>
+            </file>
+        </group>
+        <group>
+            <name>wifi_provision</name>
+            <group>
+                <name>dev_ap</name>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\dev_ap\awss_dev_ap.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\dev_ap\awss_dev_ap.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\dev_ap\dev_ap_wrapper.h</name>
+                </file>
+            </group>
+            <group>
+                <name>frameworks</name>
+                <group>
+                    <name>aplist</name>
+                    <file>
+                        <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\aplist\awss_aplist.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\aplist\awss_aplist.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>ieee80211</name>
+                    <file>
+                        <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\ieee80211\zconfig_ieee80211.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\ieee80211\zconfig_ieee80211.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>statics</name>
+                    <file>
+                        <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\statics\awss_statis.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\statics\awss_statis.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>utils</name>
+                    <file>
+                        <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\utils\awss_aes_wrapper.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\utils\awss_aes_wrapper.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\utils\awss_crypt.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\utils\awss_crypt.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\utils\zconfig_utils.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\utils\zconfig_utils.h</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\aws_lib.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\awss.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\awss_main.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\awss_main.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\awss_smartconfig.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\zconfig_lib.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\zconfig_protocol.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\zconfig_protocol.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\frameworks\zconfig_vendor_common.c</name>
+                </file>
+            </group>
+            <group>
+                <name>p2p</name>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\p2p\awss_wps.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\p2p\awss_wps.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\linkkit\wifi_provision\p2p\p2p_wrapper.h</name>
+                </file>
+            </group>
+            <file>
+                <name>$PROJ_DIR$\linkkit\wifi_provision\wifi_provision_api.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\linkkit\wifi_provision\wifi_provision_internal.h</name>
             </file>
         </group>
         <group>

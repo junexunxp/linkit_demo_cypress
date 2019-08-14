@@ -8,6 +8,8 @@
 #include "infra_defs.h"
 #include "infra_compat.h"
 #include "wrappers_defs.h"
+#include "iot_import_awss.h"
+#include "os.h"
 #include "stdarg.h"
 
 #include <stdlib.h>
@@ -21,6 +23,10 @@
 
 #include "sockets.h"
 #include "netdb.h"
+#include "wwd_wifi.h"
+#include "wwd_network.h"
+#include "tcpip.h"
+#include "aes.h"
 
 #define HAL_SEM_MAX_COUNT           (10)
 #define HAL_SEM_INIT_COUNT          (0)
@@ -28,24 +34,27 @@
 #define UINT32_IPADDR_TO_CSV_BYTES(a) ((uint8_t)((a) >> 24) & 0xFF), (uint8_t)(((a) >> 16) & 0xFF), (uint8_t)(((a) >> 8) & 0xFF), (uint8_t)((a)&0xFF)
 #define CSV_BYTES_TO_UINT32_IPADDR(a0, a1, a2, a3)  (((uint32_t)(a0)&0xFF) << 24) | (((uint32_t)(a1)&0xFF) << 16) | (((uint32_t)(a2)&0xFF) << 8) | ((uint32_t)(a3)&0xFF)
 #if (DEMO_OPTION == DEMO_RGB_LIGHT)
-static char _product_key[IOTX_PRODUCT_KEY_LEN + 1]       = "a1jhtm1uKRW";//"a1ymMP3cHNl";//
-static char _product_secret[IOTX_PRODUCT_SECRET_LEN + 1] = "xa5x9tWKYaTxcfQN";//"xZ5vuNVnL4lsYhom";//
-static char _device_name[IOTX_DEVICE_NAME_LEN + 1]       = "rgb_light1";//"light_s";//
-static char _device_secret[IOTX_DEVICE_SECRET_LEN + 1]   = "i5ZIr76MzmjbK4yl3BR7xOm9bpEhUilZ";//"ADzNMcnnW37pQPdLFJkZiJFDsv5BkGJy";// 
+const char _product_key[IOTX_PRODUCT_KEY_LEN + 1]       = "a1jhtm1uKRW";//"a1ymMP3cHNl";//
+const char _product_secret[IOTX_PRODUCT_SECRET_LEN + 1] = "xa5x9tWKYaTxcfQN";//"xZ5vuNVnL4lsYhom";//
+const char _device_name[IOTX_DEVICE_NAME_LEN + 1]       = "rgb_light1";//"light_s";//
+const char _device_secret[IOTX_DEVICE_SECRET_LEN + 1]   = "i5ZIr76MzmjbK4yl3BR7xOm9bpEhUilZ";//"ADzNMcnnW37pQPdLFJkZiJFDsv5BkGJy";// 
 #elif (DEMO_OPTION == DEMO_DIM_LIGHT)
-static char _product_key[IOTX_PRODUCT_KEY_LEN + 1]       = "a1ymMP3cHNl";//"a1ymMP3cHNl";//
-static char _product_secret[IOTX_PRODUCT_SECRET_LEN + 1] = "xZ5vuNVnL4lsYhom";//"xZ5vuNVnL4lsYhom";//
-static char _device_name[IOTX_DEVICE_NAME_LEN + 1]       = "nxptest";//"light_s";//
-static char _device_secret[IOTX_DEVICE_SECRET_LEN + 1]   = "YU1zDB1jSpi8NMOyFJ8BjU3eMT6NtyQr";//"ADzNMcnnW37pQPdLFJkZiJFDsv5BkGJy";// 
+const char _product_key[IOTX_PRODUCT_KEY_LEN + 1]       = "a1ymMP3cHNl";//"a1ymMP3cHNl";//
+const char _product_secret[IOTX_PRODUCT_SECRET_LEN + 1] = "xZ5vuNVnL4lsYhom";//"xZ5vuNVnL4lsYhom";//
+const char _device_name[IOTX_DEVICE_NAME_LEN + 1]       = "nxptest";//"light_s";//
+const char _device_secret[IOTX_DEVICE_SECRET_LEN + 1]   = "YU1zDB1jSpi8NMOyFJ8BjU3eMT6NtyQr";//"ADzNMcnnW37pQPdLFJkZiJFDsv5BkGJy";// 
 #elif (DEMO_OPTION == DEMO_WASHING_MACHINE)
-static char _product_key[IOTX_PRODUCT_KEY_LEN + 1]       = "a11YVxsGk3F";//"a1yTPNyMPfs";//
-static char _product_secret[IOTX_PRODUCT_SECRET_LEN + 1] = "nyvvTvStgB8RuUR8";//"UmRzdvUNtrhEWnja";//
-static char _device_name[IOTX_DEVICE_NAME_LEN + 1]       = "smart_wm_test1";//"test_light_03";//
-static char _device_secret[IOTX_DEVICE_SECRET_LEN + 1]   = "QtWqlFIuhCHTWzr1bdSpFiuNkygLycn6";//"8Z1sE1ik57d7FyTAC2HOfS8Lr43hXrGO";//
-
+const char _product_key[IOTX_PRODUCT_KEY_LEN + 1]       = "a11YVxsGk3F";//"a1yTPNyMPfs";//
+const char _product_secret[IOTX_PRODUCT_SECRET_LEN + 1] = "nyvvTvStgB8RuUR8";//"UmRzdvUNtrhEWnja";//
+const char _device_name[IOTX_DEVICE_NAME_LEN + 1]       = "smart_wm_test1";//"test_light_03";//
+const char _device_secret[IOTX_DEVICE_SECRET_LEN + 1]   = "QtWqlFIuhCHTWzr1bdSpFiuNkygLycn6";//"8Z1sE1ik57d7FyTAC2HOfS8Lr43hXrGO";//
+#elif (DEMO_OPTION == DEMO_GATEWAY)
+const char _product_key[IOTX_PRODUCT_KEY_LEN + 1]       = "a1c5Owlaxck";//"a1yTPNyMPfs";//
+const char _product_secret[IOTX_PRODUCT_SECRET_LEN + 1] = "K5IHiCAbnsRKAMWb";//"UmRzdvUNtrhEWnja";//
+const char _device_name[IOTX_DEVICE_NAME_LEN + 1]       = "nxp_gw_01";//"test_light_03";//
+const char _device_secret[IOTX_DEVICE_SECRET_LEN + 1]   = "Zh5HgTTY1FuVF65uI5l0Sl4Q5OzLVm9a";//"8Z1sE1ik57d7FyTAC2HOfS8Lr43hXrGO";//
 #endif
 uint64_t HAL_UptimeMs(void);
-
 static uint64_t _linux_get_time_ms(void)
 {
     return HAL_UptimeMs();
@@ -64,6 +73,243 @@ static uint64_t _linux_time_left(uint64_t t_end, uint64_t t_now)
     return t_left;
 }
 
+typedef struct{
+	mbedtls_aes_context mac;
+	uint8_t iv[16];
+	uint8_t mode;
+}hal_aes_128_ctx_t;
+static uint8_t channel_set_complete = 0;
+static uint8_t channel_set_triggered = 0;
+
+int HAL_Aes128_Cfb_Decrypt(
+            _IN_ p_HAL_Aes128_t aes,
+            _IN_ const void *src,
+            _IN_ size_t length,
+            _OU_ void *dst)
+{
+
+	hal_aes_128_ctx_t *ha128c = (hal_aes_128_ctx_t *)aes;
+	int offset = 0;
+	int ret = mbedtls_aes_crypt_cfb128(&ha128c->mac, ha128c->mode, length, &offset, ha128c->iv, src, dst);
+	PRINTF("Aes 128 run result %d\r\n",ret);
+
+	return ret;
+}
+
+int HAL_Aes128_Cbc_Decrypt(
+            _IN_ p_HAL_Aes128_t aes,
+            _IN_ const void *src,
+            _IN_ size_t length,
+            _OU_ void *dst)
+{
+
+	int i	= 0;
+	int ret = -1;
+	hal_aes_128_ctx_t *ha128c = (hal_aes_128_ctx_t *)aes;
+	if (!aes || !src || !dst) return ret;
+
+	return mbedtls_aes_crypt_cbc(&ha128c->mac, ha128c->mode, 16*2*length, ha128c->iv, src, dst);
+
+}
+
+int HAL_Aes128_Destroy(_IN_ p_HAL_Aes128_t aes)
+{
+	vPortFree(aes);
+	return 0;
+}
+
+
+p_HAL_Aes128_t HAL_Aes128_Init(
+            _IN_ const uint8_t *key,
+            _IN_ const uint8_t *iv,
+            _IN_ AES_DIR_t dir)
+{
+	hal_aes_128_ctx_t *ha128c = (hal_aes_128_ctx_t *)pvPortMalloc(sizeof(hal_aes_128_ctx_t));
+	if(!ha128c){
+		PRINTF("%s mem alloc error\r\n",__func__);
+		return NULL;
+	}
+	memcpy(ha128c->iv,iv,16);
+	mbedtls_aes_init(&ha128c->mac);
+	ha128c->mode = (dir==HAL_AES_ENCRYPTION)?MBEDTLS_AES_ENCRYPT:MBEDTLS_AES_DECRYPT;
+	if(ha128c->mode == MBEDTLS_AES_ENCRYPT){
+		mbedtls_aes_setkey_enc(&ha128c->mac, key, 128);
+	}else{
+		mbedtls_aes_setkey_dec(&ha128c->mac, key, 128);
+
+	}
+
+	return ha128c;
+}
+#define WIFI_AP_CHANNEL                 1
+#define WIFI_AP_IP_ADDR "192.168.1.1"
+#define WIFI_AP_NET_MASK "255.255.0.0"
+static struct netif wiced_if;
+
+int HAL_Awss_Open_Ap(const char *ssid, const char *passwd, int beacon_interval, int hide)
+{
+	wwd_result_t wwd_result 	= WWD_SUCCESS;
+	ip4_addr_t ap_ipaddr;
+	ip4_addr_t ap_netmask;
+	uint8_t ap_channel = WIFI_AP_CHANNEL;
+
+	if ((ip4addr_aton(WIFI_AP_IP_ADDR, &ap_ipaddr) == 0) || (ip4addr_aton(WIFI_AP_NET_MASK, &ap_netmask) == 0))
+	{
+		PRINTF("Invalid IP address\r\n");
+		return -1;
+	}
+
+	
+
+	wiced_ssid_t ap_ssid = {0};
+	ap_ssid.length = strlen(ssid);
+	memcpy(ap_ssid.value,ssid,ap_ssid.length);
+	wwd_result = wwd_wifi_start_ap(&ap_ssid, WICED_SECURITY_OPEN, (uint8_t *)passwd, strlen(passwd), WIFI_AP_CHANNEL);
+	PRINTF("Starting Access Point: SSID: %s, Chnl: %d\r\n", (char *)ap_ssid.value, ap_channel);
+	if (wwd_result != WWD_SUCCESS)
+	{
+		PRINTF("Failed to start access point\r\n");
+		return -1;
+	}
+
+	/* Configure network interface */
+	if (NULL == netif_add(&wiced_if, &ap_ipaddr, &ap_netmask, &ap_ipaddr, (void *)WWD_AP_INTERFACE, wlanif_init,
+						  tcpip_input))
+	{
+		PRINTF("Failed to start network interface\r\n");
+		return -1;
+	}
+	netif_set_default(&wiced_if);
+	netif_set_up(&wiced_if);
+
+	PRINTF("Network ready IP: %u.%u.%u.%u\r\n", (unsigned char)((htonl(wiced_if.ip_addr.addr) >> 24) & 0xff),
+		   (unsigned char)((htonl(wiced_if.ip_addr.addr) >> 16) & 0xff),
+		   (unsigned char)((htonl(wiced_if.ip_addr.addr) >> 8) & 0xff),
+		   (unsigned char)((htonl(wiced_if.ip_addr.addr) >> 0) & 0xff));
+	/* Start DHCP server */
+	start_dhcp_server(ap_ipaddr.addr);
+
+	
+}
+int HAL_Awss_Close_Ap()
+{
+	wwd_wifi_deauth_all_associated_client_stas(1, 
+											  1);
+	quit_dhcp_server();
+	wwd_wifi_stop_ap();
+	netif_remove(&wiced_if);
+	return (int)1;
+}
+
+int HAL_Awss_Connect_Ap(
+            _IN_ uint32_t connection_timeout_ms,
+            _IN_ char ssid[HAL_MAX_SSID_LEN],
+            _IN_ char passwd[HAL_MAX_PASSWD_LEN],
+            _IN_OPT_ enum AWSS_AUTH_TYPE auth,
+            _IN_OPT_ enum AWSS_ENC_TYPE encry,
+            _IN_OPT_ uint8_t bssid[ETH_ALEN],
+            _IN_OPT_ uint8_t channel)
+{
+
+	wiced_ssid_t ap_ssid = {0};
+	ap_ssid.length = strlen(ssid);
+	memcpy(ap_ssid.value,ssid,ap_ssid.length);
+	app_process_wifi_config(ssid,passwd);
+	return (int)wwd_wifi_join(&ap_ssid,WICED_SECURITY_WPA2_AES_PSK,passwd,strlen(passwd),NULL,WWD_STA_INTERFACE);
+}
+
+
+int HAL_Awss_Get_Channelscan_Interval_Ms(void)
+{
+	return (int)5*1000;
+}
+
+
+
+
+int HAL_Awss_Get_Timeout_Interval_Ms(void)
+{
+	return 30 * 60 * 1000;
+}
+
+static awss_recv_80211_frame_cb_t awss_frame_cb = NULL;
+static uint32_t current_channel = 1;
+
+void wiced_raw_data_cb(wiced_buffer_t buffer, wwd_interface_t interface){
+
+	if(awss_frame_cb){
+		int32_t rssi = 0;
+		//wwd_wifi_get_rssi(&rssi);
+		if(!channel_set_triggered){
+			awss_frame_cb(buffer->payload,buffer->len,AWSS_LINK_TYPE_NONE,1,(signed char )rssi);
+		}
+		//PRINTF("...\\\r\n");
+		
+	}
+	host_buffer_release( buffer, 1 );
+
+}
+
+void HAL_Awss_Close_Monitor(void)
+{
+	wwd_wifi_set_down();
+	wwd_wifi_disable_monitor_mode();
+	wwd_wifi_set_up();
+	wwd_wifi_set_raw_packet_processor(NULL);
+	
+	
+	channel_set_complete = 0;
+	return;
+}
+
+static void hal_monitor_on(void ){
+
+	//wwd_wifi_disable_minimum_power_consumption();
+	//wwd_wifi_set_up();
+	//wwd_wifi_turn_off_roam(true);
+	//wwd_wifi_set_scan_suppress(true);
+	wwd_wifi_set_down();
+	wwd_wifi_enable_monitor_mode();
+	wwd_wifi_set_up();
+	
+
+
+}
+
+void HAL_Awss_Open_Monitor(_IN_ awss_recv_80211_frame_cb_t cb)
+{
+	awss_frame_cb = cb;
+	//wwd_wifi_set_down();
+	wwd_wifi_set_raw_packet_processor(wiced_raw_data_cb);
+	//wwd_wifi_set_up();
+	hal_monitor_on();
+}
+
+/**
+ * @brief   设置Wi-Fi网卡切换到指定的信道(channel)上
+ *
+ * @param[in] primary_channel @n Primary channel.
+ * @param[in] secondary_channel @n Auxiliary channel if 40Mhz channel is supported, currently
+ *              this param is always 0.
+ * @param[in] bssid @n A pointer to wifi BSSID on which awss lock the channel, most HAL
+ *              may ignore it.
+ */
+static uint8_t hal_ctrl_dbug = 0;
+void HAL_Awss_Switch_Channel(char primary_channel, char secondary_channel, uint8_t bssid[ETH_ALEN])
+{
+	channel_set_triggered = 1;
+
+	wwd_wifi_set_down();
+
+	//vTaskDelay(pdMS_TO_TICKS(1000));
+	current_channel = primary_channel;
+	wwd_result_t re = wwd_wifi_set_channel(WWD_STA_INTERFACE,primary_channel);
+	//wwd_wifi_turn_off_roam(true);
+	//wwd_wifi_set_scan_suppress(true);
+	wwd_wifi_set_up();
+	channel_set_triggered = 0;
+	PRINTF("channel switch set result 0x%x\r\n",re);
+}
 
 /**
  * @brief Deallocate memory block
@@ -382,7 +628,28 @@ int HAL_SemaphoreWait(void *sem, uint32_t timeout_ms)
     return 0;
 }
 
+int HAL_SetDeviceName(char *device_name)
+{
+	return (int)1;
+}
 
+
+int HAL_SetDeviceSecret(char *device_secret)
+{
+	return (int)1;
+}
+
+
+int HAL_SetProductKey(char *product_key)
+{
+	return (int)1;
+}
+
+
+int HAL_SetProductSecret(char *product_secret)
+{
+	return (int)1;
+}
 /**
  * @brief Sleep thread itself.
  *
@@ -1017,7 +1284,10 @@ int HAL_Vsnprintf(char *str, const int len, const char *format, va_list ap)
 {
 	return vsnprintf(str, len, format, ap);
 }
-
+int HAL_Wifi_Get_Ap_Info(char ssid[HAL_MAX_SSID_LEN],char passwd[HAL_MAX_PASSWD_LEN],uint8_t bssid[ETH_ALEN])
+{
+	return (int)1;
+}
 extern struct netif fsl_netif0;
 
 uint32_t HAL_Wifi_Get_IP(char ip_str[NETWORK_ADDR_LEN], const char *ifname)

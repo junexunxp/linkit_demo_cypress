@@ -32,11 +32,11 @@ const struct awss_cmp_couple awss_online_couple[] = {
     {-1, TOPIC_MATCH_REPORT_REPLY, (void *)awss_report_token_reply},
 #ifdef WIFI_PROVISION_ENABLED
 #ifndef AWSS_DISABLE_REGISTRAR
-    {-1, TOPIC_ZC_CHECKIN,         awss_enrollee_checkin},
-    {-1, TOPIC_ZC_ENROLLEE_REPLY,  awss_report_enrollee_reply},
-    {-1, TOPIC_ZC_CIPHER_REPLY,    awss_get_cipher_reply},
+    {-1, TOPIC_ZC_CHECKIN,         (void *)awss_enrollee_checkin},
+    {-1, TOPIC_ZC_ENROLLEE_REPLY,  (void *)awss_report_enrollee_reply},
+    {-1, TOPIC_ZC_CIPHER_REPLY,    (void *)awss_get_cipher_reply},
 #endif
-    {-1, TOPIC_SWITCHAP,           awss_online_switchap}
+    {-1, TOPIC_SWITCHAP,           (void *)awss_online_switchap}
 #endif
 };
 

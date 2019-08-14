@@ -177,19 +177,19 @@ int awss_cmp_coap_deinit()
 const struct awss_cmp_couple awss_local_couple[] = {
 #ifdef WIFI_PROVISION_ENABLED
 #if defined(AWSS_SUPPORT_ADHA) || defined(AWSS_SUPPORT_AHA)
-    {AWSS_LC_INIT_PAP,                       TOPIC_AWSS_SWITCHAP,                 wifimgr_process_switch_ap_request},
-    {AWSS_LC_INIT_PAP,                       TOPIC_AWSS_WIFILIST,                 wifimgr_process_get_wifilist_request},
-    {AWSS_LC_INIT_ROUTER | AWSS_LC_INIT_PAP, TOPIC_AWSS_GETDEVICEINFO_MCAST,      wifimgr_process_mcast_get_device_info},
-    {AWSS_LC_INIT_ROUTER | AWSS_LC_INIT_PAP, TOPIC_AWSS_GETDEVICEINFO_UCAST,      wifimgr_process_ucast_get_device_info},
+    {AWSS_LC_INIT_PAP,                       TOPIC_AWSS_SWITCHAP,                 (void *)wifimgr_process_switch_ap_request},
+    {AWSS_LC_INIT_PAP,                       TOPIC_AWSS_WIFILIST,                 (void *)wifimgr_process_get_wifilist_request},
+    {AWSS_LC_INIT_ROUTER | AWSS_LC_INIT_PAP, TOPIC_AWSS_GETDEVICEINFO_MCAST,      (void *)wifimgr_process_mcast_get_device_info},
+    {AWSS_LC_INIT_ROUTER | AWSS_LC_INIT_PAP, TOPIC_AWSS_GETDEVICEINFO_UCAST,      (void *)wifimgr_process_ucast_get_device_info},
 #endif
 #ifdef AWSS_SUPPORT_DEV_AP
-    {AWSS_LC_INIT_DEV_AP,                    TOPIC_AWSS_DEV_AP_SWITCHAP,          wifimgr_process_dev_ap_switchap_request},
+    {AWSS_LC_INIT_DEV_AP,                    TOPIC_AWSS_DEV_AP_SWITCHAP,          (void *)wifimgr_process_dev_ap_switchap_request},
 #endif
-    {AWSS_LC_INIT_SUC,                       TOPIC_AWSS_GET_CONNECTAP_INFO_MCAST, awss_process_mcast_get_connectap_info},
-    {AWSS_LC_INIT_SUC,                       TOPIC_AWSS_GET_CONNECTAP_INFO_UCAST, awss_process_ucast_get_connectap_info},
+    {AWSS_LC_INIT_SUC,                       TOPIC_AWSS_GET_CONNECTAP_INFO_MCAST, (void *)awss_process_mcast_get_connectap_info},
+    {AWSS_LC_INIT_SUC,                       TOPIC_AWSS_GET_CONNECTAP_INFO_UCAST, (void *)awss_process_ucast_get_connectap_info},
 #ifndef AWSS_DISABLE_REGISTRAR
-    {AWSS_LC_INIT_BIND,                      TOPIC_NOTIFY,                        online_dev_bind_monitor},
-    {AWSS_LC_INIT_BIND,                      TOPIC_AWSS_CONNECTAP_NOTIFY,         online_dev_bind_monitor},
+    {AWSS_LC_INIT_BIND,                      TOPIC_NOTIFY,                        (void *)online_dev_bind_monitor},
+    {AWSS_LC_INIT_BIND,                      TOPIC_AWSS_CONNECTAP_NOTIFY,         (void *)online_dev_bind_monitor},
 #endif
 #endif
     {AWSS_LC_INIT_SUC | AWSS_LC_INIT_BIND,  TOPIC_GETDEVICEINFO_MCAST,           (void *)online_mcast_get_device_info},

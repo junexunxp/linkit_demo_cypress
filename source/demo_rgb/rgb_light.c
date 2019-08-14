@@ -226,7 +226,7 @@ static int rgb_light_property_set_event_handler(const int devid, const char *req
 
 			HAL_Printf("Invalid RGB vlaue set\r\n");
 		}else{
-       		rgb_light_set_hdl(redV->valueint,RGBColor->valueint,RGBColor->valueint);
+       		rgb_light_set_hdl(redV->valueint,greenV->valueint,blueV->valueint);
 		}
     }
     cJSON_Delete(p_root);

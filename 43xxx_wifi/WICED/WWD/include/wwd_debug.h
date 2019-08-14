@@ -67,7 +67,7 @@ int platform_wprint_permission(void);
 #endif
 
 #define PRINT_BUF(arg1,arg2 )
-#define PRINT_PKT(str,pkt,len,typ)
+#define PRINT_PKT(str,pkt,len,typ)	
 
 
 
@@ -251,19 +251,19 @@ int platform_wprint_permission(void);
 
 
 /* WICED printing macros for Wiced Wi-Fi Driver*/
-#define WPRINT_ENABLE_WWD_INFO
 #ifdef WPRINT_ENABLE_WWD_INFO
     #define WPRINT_WWD_INFO(args) WPRINT_MACRO(args)
 #else
     #define WPRINT_WWD_INFO(args)
 #endif
 
-//#define WPRINT_ENABLE_WWD_DEBUG
+
 #ifdef WPRINT_ENABLE_WWD_DEBUG
     #define WPRINT_WWD_DEBUG(args) WPRINT_MACRO(args)
 #else
     #define WPRINT_WWD_DEBUG(args)
 #endif
+
 
 #ifdef WPRINT_ENABLE_WWD_ERROR
     #define WPRINT_WWD_ERROR(args) { WPRINT_MACRO(args); WICED_BREAK_IF_DEBUG(); }
